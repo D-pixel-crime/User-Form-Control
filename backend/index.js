@@ -21,6 +21,10 @@ app.use(
     secret: process.env.SESSION_SECRET || "your_default_secret",
     resave: false,
     saveUninitialized: true,
+    cookie: {
+      secure: false,
+      sameSite: "None",
+    },
   })
 );
 app.use(passport.initialize());
@@ -69,10 +73,16 @@ app.get(
   }
 );
 
-app.get("/logout", (req, res) => {
-  req.logout();
-  res.clearCookie("user");
-  res.redirect(process.env.FRONTEND_URI);
+app.get("/auth/logout", (req, res, next) => {
+  req.logout((err) => {
+    if (err) {
+      return next(err);
+    }
+    console.log(`Logout successful`.bgRed);
+    res.clearCookie("connect.sid");
+    res.clearCookie("user");
+    return res.redirect(process.env.FRONTEND_URI);
+  });
 });
 
 app.listen(port, () => {
