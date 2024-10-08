@@ -6,6 +6,7 @@ export const Home = () => {
     await axios.get(`${import.meta.env.VITE_BACKEND_URI}/auth/logout`, {
       withCredentials: true,
     });
+    window.location.href = "/login";
   };
 
   return (

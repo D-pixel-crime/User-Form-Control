@@ -3,6 +3,7 @@ export const Login = () => {
     window.open(`${import.meta.env.VITE_BACKEND_URI}/auth/google`, "_self");
   };
 
+
   return (
     <div className="w-full h-screen flex-center">
       <button

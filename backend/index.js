@@ -6,6 +6,7 @@ import passport from "passport";
 import GoogleStrategy from "passport-google-oauth20";
 import session from "express-session";
 import "colors";
+import { authRouter } from "./handlers/authHandlers/auth.js";
 
 const app = express();
 const port = 3000;
@@ -24,6 +25,7 @@ app.use(
     cookie: {
       secure: false,
       sameSite: "None",
+      maxAge: 1000 * 60 * 60 * 24 * 2,
     },
   })
 );
@@ -54,36 +56,7 @@ passport.use(
   )
 );
 
-app.get(
-  "/auth/google",
-  passport.authenticate("google", {
-    scope: ["profile", "email"],
-  })
-);
-
-app.get(
-  "/auth/google/callback",
-  passport.authenticate("google"),
-  (req, res) => {
-    console.log(`Login successfull`.bgGreen);
-    console.log(req.user);
-
-    res.cookie("user", req.user);
-    return res.redirect(process.env.FRONTEND_URI);
-  }
-);
-
-app.get("/auth/logout", (req, res, next) => {
-  req.logout((err) => {
-    if (err) {
-      return next(err);
-    }
-    console.log(`Logout successful`.bgRed);
-    res.clearCookie("connect.sid");
-    res.clearCookie("user");
-    return res.redirect(process.env.FRONTEND_URI);
-  });
-});
+app.use("/auth", authRouter);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
