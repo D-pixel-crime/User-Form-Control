@@ -1,29 +1,27 @@
-import axios from "axios";
+import Form from "../containers/Form";
+import { MainContainer } from "../containers/MainContainer";
 import Cookies from "js-cookie";
+import AccountMenu from "../ui/AccountMenu";
 
 export const Home = () => {
-  const handleLogout = async () => {
-    await axios.get(`${import.meta.env.VITE_BACKEND_URI}/auth/logout`, {
-      withCredentials: true,
-    });
-    window.location.href = "/login";
-  };
+  const name = decodeURIComponent(Cookies.get("name") || "");
 
   return (
-    <article className="w-full h-screen">
-      <h1 className="text-4xl font-bold">Welcome to the Home page!</h1>
-      <br />
-      {Cookies.get("user") && (
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            handleLogout();
-          }}
-          className="bg-red-600 hover:bg-transparent rounded-md text-white hover:text-red-500 border-2 border-red-600 px-2 py-1.5"
-        >
-          Logout
-        </button>
-      )}
-    </article>
+    <MainContainer>
+      <article className="w-full h-full flex flex-col gap-10 mb-5">
+        <section className="px-10 py-5 flex items-center justify-end">
+          <AccountMenu />
+        </section>
+        <section className="w-full flex-center flex-col">
+          <h1 className="text-3xl text-center">
+            Welcome,{" "}
+            <span className="w-fit bg-gradient-to-tr from-violet-500 via-red-400 to-violet-500 text-transparent bg-clip-text">
+              {name}
+            </span>
+          </h1>
+          <Form />
+        </section>
+      </article>
+    </MainContainer>
   );
 };
