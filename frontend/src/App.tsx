@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
 import { Login } from "./routes/Login";
 import { Home } from "./routes/Home";
+import Logs from "./routes/Logs";
 
 const allRoutes = [
   {
@@ -11,6 +12,10 @@ const allRoutes = [
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/logs",
+    element: <Logs />,
   },
 ];
 

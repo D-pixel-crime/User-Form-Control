@@ -20,6 +20,9 @@ const UserSchema = new Schema({
   profilePic: {
     type: String,
   },
+  isAdmin: {
+    type: Boolean,
+  },
 });
 
 export const User = model("User", UserSchema);

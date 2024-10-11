@@ -44,25 +44,29 @@ authRouter.get(
   }
 );
 
-authRouter.get("/logout", (req, res, next) => {
-  req.logout(async (err) => {
-    if (err) {
-      return next(err);
-    }
-    console.log(`Logout successful`.bgRed);
-    res.clearCookie("connect.sid");
-    res.clearCookie("name");
-    res.clearCookie("email");
-    res.clearCookie("profilePic");
-    res.clearCookie("googleId");
-
+authRouter.get("/logout", async (req, res, next) => {
+  try {
     await Log.create({
       user: req.user.id,
       action: "Logout",
     });
+    req.logout((err) => {
+      if (err) {
+        return next(err);
+      }
+      console.log(`Logout successful`.bgRed);
+      res.clearCookie("connect.sid");
+      res.clearCookie("name");
+      res.clearCookie("email");
+      res.clearCookie("profilePic");
+      res.clearCookie("googleId");
 
-    return res.status(200).json({ message: "Logout Successfull." });
-  });
+      return res.status(200).json({ message: "Logout Successfull." });
+    });
+  } catch (error) {
+    console.log(`Error during logout: ${error}`.bgYellow);
+    return res.status(500).json({ message: "Error during logout." });
+  }
 });
 
 const authenticate = (req, res, next) => {

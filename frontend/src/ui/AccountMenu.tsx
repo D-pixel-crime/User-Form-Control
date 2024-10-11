@@ -10,10 +10,14 @@ import Tooltip from "@mui/material/Tooltip";
 import Logout from "@mui/icons-material/Logout";
 import Cookies from "js-cookie";
 import axios from "axios";
+import EmailIcon from "@mui/icons-material/Email";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import { Link } from "react-router-dom";
 
 export default function AccountMenu() {
   const profilePic = decodeURIComponent(Cookies.get("profilePic") || "");
   const email = decodeURIComponent(Cookies.get("email") || "");
+  const [isAdmin, setIsAdmin] = React.useState(false);
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -36,6 +40,23 @@ export default function AccountMenu() {
       handleClose();
     }
   };
+
+  React.useLayoutEffect(() => {
+    const handleCheck = async () => {
+      try {
+        const { data } = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URI}/get/isAdmin`,
+          { withCredentials: true }
+        );
+        if (data.isAdmin) {
+          setIsAdmin(true);
+        }
+      } catch (error: any) {
+        console.error(error.response.message);
+      }
+    };
+    handleCheck();
+  }, []);
 
   return (
     <React.Fragment>
@@ -94,9 +115,24 @@ export default function AccountMenu() {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <MenuItem onClick={handleClose}>
-          <Avatar /> {email}
-        </MenuItem>
+        <Link to="/">
+          <MenuItem>
+            <Avatar>
+              <EmailIcon />
+            </Avatar>{" "}
+            {email}
+          </MenuItem>
+        </Link>
+        {isAdmin && (
+          <Link to="/logs">
+            <MenuItem>
+              <Avatar>
+                <AdminPanelSettingsIcon />
+              </Avatar>{" "}
+              Logs
+            </MenuItem>
+          </Link>
+        )}
         <Divider />
         <MenuItem onClick={handleLogout}>
           <ListItemIcon>

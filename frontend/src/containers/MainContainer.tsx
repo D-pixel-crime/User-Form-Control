@@ -15,7 +15,7 @@ export const MainContainer = ({ children }: mainContainerProps) => {
   });
 
   return (
-    <main className="w-screen h-screen bg-slate-300 overflow-x-hidden">
+    <main className="min-h-screen w-max-screen overflow-x-hidden bg-slate-300">
       {children}
     </main>
   );

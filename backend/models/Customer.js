@@ -25,7 +25,7 @@ const CustomerSchema = new Schema({
     },
   },
   createdAt: {
-    type: Date,
+    type: String,
     default: () => new Date().toLocaleString(),
   },
   location: {

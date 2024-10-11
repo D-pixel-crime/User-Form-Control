@@ -7,7 +7,7 @@ import { Log } from "../../models/Log.js";
 
 const __dirname = path.resolve();
 
-const WHATSAPP_API_URL = "https://api.whatsapp.com/send?text=";
+const WHATSAPP_API_URL = process.env.WHATSAPP_API_URL;
 const COMPANY_NAME = process.env.COMPANY_NAME;
 
 export const createCustomer = async (req, res) => {
@@ -41,13 +41,13 @@ export const createCustomer = async (req, res) => {
     if (!fs.existsSync(pdfDir)) {
       fs.mkdirSync(pdfDir);
     }
-    const pdfPath = path.join(pdfDir, `${newCustomer._id}.pdf`);
+    const pdfPath = path.join(pdfDir, `${id}.pdf`);
 
     console.log(`PDF created at ${pdfPath}`.bgGreen);
 
     fs.writeFileSync(pdfPath, pdfBuffer);
 
-    const whatsappMessage = `Hello Mr ${name},\n\nThis message is to inform you that you have been successfully added as a customer at ${COMPANY_NAME}.\nPlease verify your details if they are correct or they need to be changed.\n\nName: ${name}\nEmail: ${email}\nPhone: +${countryCode} ${number}\nLocation: ${city}, ${state}, ${country}\n\nIf the details given are correct, please reply as “CORRECT”. If any changes need to be made, reply as “To be Changed”.\n\nPlease reply within 48 hrs of receiving this message or we will assume your reply as “CORRECT”.\n\nThanks and regards,\nTeam ${COMPANY_NAME}`;
+    const whatsappMessage = `Hello Mr ${name},\n\nThis message is to inform you that you have been successfully added as a customer at ${COMPANY_NAME}.\nPlease verify your details if they are correct or they need to be changed.\n\nName: ${name}\nEmail: ${email}\nPhone: ${countryCode} ${number}\nLocation: ${city}, ${state}, ${country}\n\nIf the details given are correct, please reply as “CORRECT”. If any changes need to be made, reply as “To be Changed”.\n\nPlease reply within 48 hrs of receiving this message or we will assume your reply as “CORRECT”.\n\nThanks and regards,\nTeam ${COMPANY_NAME}`;
     const whatsappLink = `${WHATSAPP_API_URL}${encodeURIComponent(
       whatsappMessage
     )}`;
@@ -60,7 +60,6 @@ export const createCustomer = async (req, res) => {
     return res.status(201).json({
       message: "Customer created successfully.",
       whatsappLink,
-      pdf: pdfBuffer.toString("base64"),
     });
   } catch (error) {
     console.log(`Error during customer creation: ${error}`.bgRed);

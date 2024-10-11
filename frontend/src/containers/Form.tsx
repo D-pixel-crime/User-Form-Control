@@ -1,11 +1,22 @@
 import axios from "axios";
-import { useLayoutEffect, useState } from "react";
-import { ProgressBar, TailSpin } from "react-loader-spinner";
-import VerifiedTwoToneIcon from "@mui/icons-material/VerifiedTwoTone";
+import { useState } from "react";
+import { TailSpin } from "react-loader-spinner";
 
-const Form = () => {
-  const [isAlreadySubmitted, setIsAlreadySubmitted] = useState(true);
-  const [isInitialLoad, setIsInitialLoad] = useState(false);
+interface formProps {
+  setIsSuccess: any;
+  setIsWhatsappLinkGenerated: any;
+  handleClick: any;
+  SlideTransition: any;
+  setIsAlreadySubmitted: any;
+}
+
+const Form = ({
+  setIsSuccess,
+  setIsWhatsappLinkGenerated,
+  handleClick,
+  SlideTransition,
+  setIsAlreadySubmitted,
+}: formProps) => {
   const [userDetails, setUserDetails] = useState({
     name: "",
     email: "",
@@ -16,29 +27,6 @@ const Form = () => {
     number: "",
   });
   const [isSubmit, setIsSubmit] = useState(false);
-
-  useLayoutEffect(() => {
-    const handleCheck = async () => {
-      try {
-        const { data } = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URI}/get/check-customer`,
-          {
-            withCredentials: true,
-          }
-        );
-
-        if (data.message === "Customer found.") {
-          setIsAlreadySubmitted(true);
-        }
-      } catch (error: any) {
-        console.log(error.response.message);
-      } finally {
-        setIsInitialLoad(false);
-      }
-    };
-
-    handleCheck();
-  }, []);
 
   const handleSubmit = async () => {
     if (
@@ -74,29 +62,28 @@ const Form = () => {
         countryCode: "",
         number: "",
       });
-    } catch (error) {
+      setIsWhatsappLinkGenerated({
+        status: true,
+        link: response.data.whatsappLink,
+      });
+      setIsAlreadySubmitted(true);
+      setIsSuccess({
+        status: "success",
+        message: "Submitted Successfully!",
+      });
+    } catch (error: any) {
       setIsSubmit(false);
-      console.error(error);
+      setIsSuccess({
+        status: "error",
+        message: error.response.data.message,
+      });
     } finally {
       setIsSubmit(false);
+      handleClick(SlideTransition)();
     }
   };
 
-  return isInitialLoad ? (
-    <section className="flex-center h-52">
-      <ProgressBar barColor="#54ff2a" />
-    </section>
-  ) : isAlreadySubmitted ? (
-    <section className="flex-center mt-10 h-52 flex-col">
-      <VerifiedTwoToneIcon
-        sx={{
-          color: "#00c80d",
-          fontSize: 150,
-        }}
-      />
-      <span className="text-slate-500">Already Submitted!</span>
-    </section>
-  ) : (
+  return (
     <>
       <br />
       <span className="text-xl">Please complete the following form👇</span>
