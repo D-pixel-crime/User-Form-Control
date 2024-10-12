@@ -10,6 +10,9 @@ lerna-debug.log*
 # Environment
 .env
 
+# Files
+pdfs
+
 node_modules
 dist
 dist-ssr
