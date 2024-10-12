@@ -83,11 +83,11 @@ export const Home = () => {
           });
         }
       } catch (error: any) {
-        console.log(error.response.message);
+        console.log(error.response.data.message);
         setIsAlreadySubmitted(false);
         setIsSuccess({
           status: "error",
-          message: error.response.message,
+          message: error.response.data.message,
         });
       } finally {
         setIsInitialLoad(false);
@@ -126,7 +126,9 @@ export const Home = () => {
               <span className="text-slate-500">Already Submitted!</span>
               {isWhatsappLinkGenerated.status && (
                 <div className="flex-center w-1/2 mt-10 h-full flex-col gap-1">
-                  Continue to chat with us:
+                  <span className="underline text-xl text-green-600">
+                    THANK YOU FOR SUBMITTING! <br />
+                  </span>
                   <Link
                     to={isWhatsappLinkGenerated.link}
                     className="break-words underline text-blue-500"

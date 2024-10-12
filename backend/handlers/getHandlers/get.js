@@ -7,7 +7,7 @@ import { isAdmin } from "../../controllers/getControllers/isAdmin.js";
 const getRouter = express.Router();
 
 getRouter.get("/check-customer", authenticate, checkCustomer);
-getRouter.get("/logs/:page", authenticate, getLogs);
+getRouter.get("/logs", authenticate, getLogs);
 getRouter.get("/isAdmin", authenticate, isAdmin);
 
 export { getRouter };

@@ -12,6 +12,16 @@
   font-style: normal;
 }
 
+::-webkit-scrollbar {
+  width: 5px;
+  background-color: rgb(195, 138, 191);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgb(239, 230, 148);
+  border-radius: 10px;
+}
+
 @layer utilities {
   .flex-center {
     @apply flex justify-center items-center;

@@ -19,6 +19,7 @@ import {
 } from "@mui/material";
 import * as React from "react";
 import AccountMenu from "../ui/AccountMenu";
+import FilterMenu from "../ui/FilterMenu";
 
 function SlideTransition(props: SlideProps) {
   return <Slide {...props} direction="up" />;
@@ -29,7 +30,9 @@ const Logs = () => {
   const [page, setPage] = React.useState(1);
   const [loading, setLoading] = React.useState(false);
   const [totalPages, setTotalPages] = React.useState(1);
-
+  const [filter, setFilter] = React.useState<
+    "Login" | "Logout" | "Others" | null
+  >(null);
   const [isSuccess, setIsSuccess] = React.useState({
     status: "error" as "success" | "error" | "warning" | "info",
     message: "",
@@ -74,7 +77,9 @@ const Logs = () => {
       try {
         setLoading(true);
         const { data } = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URI}/get/logs/${page}`,
+          `${import.meta.env.VITE_BACKEND_URI}/get/logs?page=${page}${
+            filter ? `&filter=${filter}` : ""
+          }`,
           { withCredentials: true }
         );
         setLogs(data.logs || []);
@@ -97,7 +102,33 @@ const Logs = () => {
     };
 
     handleFetch();
-  }, [page]);
+  }, [page, filter]);
+
+  React.useLayoutEffect(() => {
+    const handleCheck = async () => {
+      try {
+        const { data } = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URI}/get/isAdmin`,
+          { withCredentials: true }
+        );
+        if (!data.isAdmin) {
+          setIsSuccess({
+            status: "warning",
+            message: "Unauthorized access",
+          });
+          window.location.href = "/";
+        }
+      } catch (error: any) {
+        console.error(error.response.message);
+        setIsSuccess({
+          status: "error",
+          message: error.response.message,
+        });
+        window.location.href = "/";
+      }
+    };
+    handleCheck();
+  }, []);
 
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
@@ -108,9 +139,12 @@ const Logs = () => {
 
   return (
     <MainContainer>
-      <article className="w-full h-full flex flex-col gap-10">
+      <article className="w-full h-full flex flex-col gap-10 mb-5">
         <section className="px-10 py-5 flex items-center justify-end">
           <AccountMenu />
+        </section>
+        <section className="flex items-center justify-start px-5">
+          <FilterMenu setFilter={setFilter} setPage={setPage} />
         </section>
         {loading ? (
           <section className="flex-center h-52">
