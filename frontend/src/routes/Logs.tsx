@@ -1,13 +1,7 @@
 import { MainContainer } from "../containers/MainContainer";
 import { InfinitySpin } from "react-loader-spinner";
 import axios from "axios";
-import Snackbar from "@mui/material/Snackbar";
-import Fade from "@mui/material/Fade";
-import Slide, { SlideProps } from "@mui/material/Slide";
-import { TransitionProps } from "@mui/material/transitions";
 import {
-  Alert,
-  AlertTitle,
   Table,
   TableBody,
   TableCell,
@@ -20,57 +14,17 @@ import {
 import * as React from "react";
 import AccountMenu from "../ui/AccountMenu";
 import FilterMenu from "../ui/FilterMenu";
-
-function SlideTransition(props: SlideProps) {
-  return <Slide {...props} direction="up" />;
-}
+import { useSnackbar } from "../contexts/ShowMessae";
 
 const Logs = () => {
-  const [logs, setLogs] = React.useState<any[]>([]); // Ensure logs is always an array
+  const [logs, setLogs] = React.useState<any[]>([]);
   const [page, setPage] = React.useState(1);
   const [loading, setLoading] = React.useState(false);
   const [totalPages, setTotalPages] = React.useState(1);
   const [filter, setFilter] = React.useState<
     "Login" | "Logout" | "Others" | null
   >(null);
-  const [isSuccess, setIsSuccess] = React.useState({
-    status: "error" as "success" | "error" | "warning" | "info",
-    message: "",
-  });
-
-  const [state, setState] = React.useState<{
-    open: boolean;
-    Transition: React.ComponentType<
-      TransitionProps & {
-        children: React.ReactElement<any, any>;
-      }
-    >;
-  }>({
-    open: false,
-    Transition: Fade,
-  });
-
-  const handleClick =
-    (
-      Transition: React.ComponentType<
-        TransitionProps & {
-          children: React.ReactElement<any, any>;
-        }
-      >
-    ) =>
-    () => {
-      setState({
-        open: true,
-        Transition,
-      });
-    };
-
-  const handleClose = () => {
-    setState({
-      ...state,
-      open: false,
-    });
-  };
+  const { showMessage } = useSnackbar();
 
   React.useLayoutEffect(() => {
     const handleFetch = async () => {
@@ -85,19 +39,12 @@ const Logs = () => {
         setLogs(data.logs || []);
         setTotalPages(data.totalPages || 1);
 
-        setIsSuccess({
-          status: "success",
-          message: "Logs fetched successfully",
-        });
+        showMessage("Logs fetched successfully", "success");
       } catch (error: any) {
         console.error(error.response?.message || "An error occurred");
-        setIsSuccess({
-          status: "error",
-          message: error.response?.message || "Failed to fetch logs",
-        });
+        showMessage(error.response?.message || "An error occurred", "error");
       } finally {
         setLoading(false);
-        handleClick(SlideTransition)();
       }
     };
 
@@ -112,18 +59,15 @@ const Logs = () => {
           { withCredentials: true }
         );
         if (!data.isAdmin) {
-          setIsSuccess({
-            status: "warning",
-            message: "Unauthorized access",
-          });
+          showMessage("Unauthorized", "error");
           window.location.href = "/";
         }
       } catch (error: any) {
         console.error(error.response.message);
-        setIsSuccess({
-          status: "error",
-          message: error.response.message,
-        });
+        showMessage(
+          error.response.message || "An Unexpected Error Occurred!",
+          "error"
+        );
         window.location.href = "/";
       }
     };
@@ -218,22 +162,6 @@ const Logs = () => {
           </section>
         )}
       </article>
-      <Snackbar
-        open={state.open}
-        onClose={handleClose}
-        TransitionComponent={state.Transition}
-        key={state.Transition.name}
-        autoHideDuration={4000}
-      >
-        <Alert
-          onClose={handleClose}
-          severity={isSuccess.status}
-          sx={{ width: "100%" }}
-        >
-          <AlertTitle>{isSuccess.status}</AlertTitle>
-          {isSuccess.message}
-        </Alert>
-      </Snackbar>
     </MainContainer>
   );
 };

@@ -2,20 +2,12 @@ import Form from "../containers/Form";
 import { MainContainer } from "../containers/MainContainer";
 import Cookies from "js-cookie";
 import AccountMenu from "../ui/AccountMenu";
-import Snackbar from "@mui/material/Snackbar";
-import Fade from "@mui/material/Fade";
-import Slide, { SlideProps } from "@mui/material/Slide";
-import { TransitionProps } from "@mui/material/transitions";
-import { Alert, AlertTitle } from "@mui/material";
 import * as React from "react";
 import { ProgressBar } from "react-loader-spinner";
 import VerifiedTwoToneIcon from "@mui/icons-material/VerifiedTwoTone";
 import axios from "axios";
 import { Link } from "react-router-dom";
-
-function SlideTransition(props: SlideProps) {
-  return <Slide {...props} direction="up" />;
-}
+import { useSnackbar } from "../contexts/ShowMessae";
 
 export const Home = () => {
   const name = decodeURIComponent(Cookies.get("name") || "");
@@ -25,45 +17,7 @@ export const Home = () => {
     status: false,
     link: "",
   });
-
-  const [isSuccess, setIsSuccess] = React.useState({
-    status: "error" as "success" | "error" | "warning" | "info",
-    message: "",
-  });
-
-  const [state, setState] = React.useState<{
-    open: boolean;
-    Transition: React.ComponentType<
-      TransitionProps & {
-        children: React.ReactElement<any, any>;
-      }
-    >;
-  }>({
-    open: false,
-    Transition: Fade,
-  });
-
-  const handleClick =
-    (
-      Transition: React.ComponentType<
-        TransitionProps & {
-          children: React.ReactElement<any, any>;
-        }
-      >
-    ) =>
-    () => {
-      setState({
-        open: true,
-        Transition,
-      });
-    };
-
-  const handleClose = () => {
-    setState({
-      ...state,
-      open: false,
-    });
-  };
+  const { showMessage } = useSnackbar();
 
   React.useLayoutEffect(() => {
     const handleCheck = async () => {
@@ -77,21 +31,17 @@ export const Home = () => {
 
         if (data.message === "Customer found.") {
           setIsAlreadySubmitted(true);
-          setIsSuccess({
-            status: "success",
-            message: "Already Submitted!",
-          });
+          showMessage("Already Submitted!", "info");
         }
       } catch (error: any) {
         console.log(error.response.data.message);
         setIsAlreadySubmitted(false);
-        setIsSuccess({
-          status: "error",
-          message: error.response.data.message,
-        });
+        showMessage(
+          error.response.data.message || "An Unexpected Error Occurred!",
+          "error"
+        );
       } finally {
         setIsInitialLoad(false);
-        handleClick(SlideTransition)();
       }
     };
 
@@ -140,31 +90,12 @@ export const Home = () => {
             </section>
           ) : (
             <Form
-              SlideTransition={SlideTransition}
               setIsAlreadySubmitted={setIsAlreadySubmitted}
-              handleClick={handleClick}
-              setIsSuccess={setIsSuccess}
               setIsWhatsappLinkGenerated={setIsWhatsappLinkGenerated}
             />
           )}
         </section>
       </article>
-      <Snackbar
-        open={state.open}
-        onClose={handleClose}
-        TransitionComponent={state.Transition}
-        key={state.Transition.name}
-        autoHideDuration={4000}
-      >
-        <Alert
-          onClose={handleClose}
-          severity={isSuccess.status}
-          sx={{ width: "100%" }}
-        >
-          <AlertTitle>{isSuccess.status}</AlertTitle>
-          {isSuccess.message}
-        </Alert>
-      </Snackbar>
     </MainContainer>
   );
 };

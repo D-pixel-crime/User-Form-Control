@@ -1,20 +1,15 @@
 import axios from "axios";
 import { useState } from "react";
 import { TailSpin } from "react-loader-spinner";
+import { useSnackbar } from "../contexts/ShowMessae";
 
 interface formProps {
-  setIsSuccess: any;
   setIsWhatsappLinkGenerated: any;
-  handleClick: any;
-  SlideTransition: any;
   setIsAlreadySubmitted: any;
 }
 
 const Form = ({
-  setIsSuccess,
   setIsWhatsappLinkGenerated,
-  handleClick,
-  SlideTransition,
   setIsAlreadySubmitted,
 }: formProps) => {
   const [userDetails, setUserDetails] = useState({
@@ -27,6 +22,7 @@ const Form = ({
     number: "",
   });
   const [isSubmit, setIsSubmit] = useState(false);
+  const { showMessage } = useSnackbar();
 
   const handleSubmit = async () => {
     if (
@@ -67,19 +63,15 @@ const Form = ({
         link: response.data.whatsappLink,
       });
       setIsAlreadySubmitted(true);
-      setIsSuccess({
-        status: "success",
-        message: "Submitted Successfully!",
-      });
+      showMessage("Form Submitted Successfully", "success");
     } catch (error: any) {
       setIsSubmit(false);
-      setIsSuccess({
-        status: "error",
-        message: error.response.data.message,
-      });
+      showMessage(
+        error.response.data.message || "An Unexpected Error Occurred!",
+        "error"
+      );
     } finally {
       setIsSubmit(false);
-      handleClick(SlideTransition)();
     }
   };
 
