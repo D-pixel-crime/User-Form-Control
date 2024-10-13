@@ -4,11 +4,13 @@ import { createPDF } from "../../utils/createPDF.js";
 import path from "path";
 import fs from "fs";
 import { Log } from "../../models/Log.js";
+import axios from "axios";
 
 const __dirname = path.resolve();
 
 const WHATSAPP_API_URL = process.env.WHATSAPP_API_URL;
 const COMPANY_NAME = process.env.COMPANY_NAME;
+const WEBHOOK_URL = process.env.WEBHOOK_URL;
 
 export const createCustomer = async (req, res) => {
   const id = req.user.id;
@@ -56,6 +58,24 @@ export const createCustomer = async (req, res) => {
       user: id,
       action: "Customer created",
     });
+
+    if (WEBHOOK_URL) {
+      await axios.post(`${WEBHOOK_URL}/api/webhooks/customer-created`, {
+        event: "Customer Created",
+        customer: {
+          id: newCustomer._id,
+          name: newCustomer.name,
+          email: newCustomer.email,
+          phone: newCustomer.phone,
+          location: newCustomer.location,
+        },
+        actionBy: id,
+        timestamp: new Date(),
+      });
+      console.log(`Webhook notification sent successfully.`.bgGreen);
+    } else {
+      console.log(`Webhook URL not configured.`.bgYellow);
+    }
 
     return res.status(201).json({
       message: "Customer created successfully.",

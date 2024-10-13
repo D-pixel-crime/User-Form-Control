@@ -1,0 +1,16 @@
+{
+  "name": "webhook-listener",
+  "version": "1.0.0",
+  "description": "Listener for webhooks",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Deepak Kumar Pal",
+  "license": "ISC",
+  "dependencies": {
+    "colors": "^1.4.0",
+    "express": "^4.21.1"
+  }
+}
