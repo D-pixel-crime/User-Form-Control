@@ -1,9 +1,17 @@
 import express from "express";
 import "colors";
+import cors from "cors";
+import "dotenv/config";
 
 const app = express();
 const PORT = 5000;
 
+app.use(
+  cors({
+    origin: process.env.BACKEND_URI,
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

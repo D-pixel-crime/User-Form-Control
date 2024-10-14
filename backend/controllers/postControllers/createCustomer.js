@@ -8,9 +8,10 @@ import axios from "axios";
 
 const __dirname = path.resolve();
 
-const WHATSAPP_API_URL = process.env.WHATSAPP_API_URL;
 const COMPANY_NAME = process.env.COMPANY_NAME;
 const WEBHOOK_URL = process.env.WEBHOOK_URL;
+const COMPANY_COUNTRY_CODE = process.env.COUNTRY_CODE;
+const COMPANY_NUMBER = process.env.NUMBER;
 
 export const createCustomer = async (req, res) => {
   const id = req.user.id;
@@ -49,8 +50,9 @@ export const createCustomer = async (req, res) => {
 
     fs.writeFileSync(pdfPath, pdfBuffer);
 
-    const whatsappMessage = `Hello Mr ${name},\n\nThis message is to inform you that you have been successfully added as a customer at ${COMPANY_NAME}.\nPlease verify your details if they are correct or they need to be changed.\n\nName: ${name}\nEmail: ${email}\nPhone: ${countryCode} ${number}\nLocation: ${city}, ${state}, ${country}\n\nIf the details given are correct, please reply as “CORRECT”. If any changes need to be made, reply as “To be Changed”.\n\nPlease reply within 48 hrs of receiving this message or we will assume your reply as “CORRECT”.\n\nThanks and regards,\nTeam ${COMPANY_NAME}`;
-    const whatsappLink = `${WHATSAPP_API_URL}${encodeURIComponent(
+    const whatsappMessage = `Hello ${COMPANY_NAME},\n\nI have received confirmation of my registration as a customer. Here are my details:\n\nName: ${name}\nEmail: ${email}\nPhone: ${countryCode} ${number}\nLocation: ${city}, ${state}, ${country}\n\nIf these details are correct, please confirm by replying “CORRECT”. If any changes are needed, please reply with the updated information.\n\nThank you,\n${name}`;
+
+    const whatsappLink = `https://wa.me/${COMPANY_COUNTRY_CODE}${COMPANY_NUMBER}?text=${encodeURIComponent(
       whatsappMessage
     )}`;
 
@@ -60,18 +62,22 @@ export const createCustomer = async (req, res) => {
     });
 
     if (WEBHOOK_URL) {
-      await axios.post(`${WEBHOOK_URL}/api/webhooks/customer-created`, {
-        event: "Customer Created",
-        customer: {
-          id: newCustomer._id,
-          name: newCustomer.name,
-          email: newCustomer.email,
-          phone: newCustomer.phone,
-          location: newCustomer.location,
+      await axios.post(
+        `${WEBHOOK_URL}/api/webhooks/customer-created`,
+        {
+          event: "Customer Created",
+          customer: {
+            id: newCustomer._id,
+            name: newCustomer.name,
+            email: newCustomer.email,
+            phone: newCustomer.phone,
+            location: newCustomer.location,
+          },
+          actionBy: id,
+          timestamp: new Date(),
         },
-        actionBy: id,
-        timestamp: new Date(),
-      });
+        { withCredentials: true }
+      );
       console.log(`Webhook notification sent successfully.`.bgGreen);
     } else {
       console.log(`Webhook URL not configured.`.bgYellow);

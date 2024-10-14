@@ -51,9 +51,10 @@ export default function AccountMenu() {
             aria-haspopup="true"
             aria-expanded={open ? "true" : undefined}
           >
-            <img
+            <Avatar
               src={profilePic}
               alt="Profile-Pic"
+              imgProps={{ loading: "lazy" }}
               className="rounded-full size-12"
             />
           </IconButton>
