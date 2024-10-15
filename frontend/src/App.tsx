@@ -5,11 +5,9 @@ import { Home } from "./routes/Home";
 import Logs from "./routes/Logs";
 import { useLayoutEffect, useState } from "react";
 import axios from "axios";
-import { RotatingLines } from "react-loader-spinner";
 
 function App() {
   const [isAdmin, setIsAdmin] = useState(false);
-  const [isCheck, setIsCheck] = useState(true);
 
   useLayoutEffect(() => {
     const handleCheck = async () => {
@@ -21,7 +19,6 @@ function App() {
         if (data.isAdmin) {
           setIsAdmin(true);
         }
-        setIsCheck(false);
       } catch (error: any) {
         console.error(error.response.message);
       }
@@ -40,11 +37,7 @@ function App() {
     },
   ];
 
-  return isCheck ? (
-    <main className="w-screen h-screen flex-center">
-      <RotatingLines width="50" />
-    </main>
-  ) : (
+  return (
     <BrowserRouter>
       <Routes>
         {allRoutes.map((eachRoute, index) => (
